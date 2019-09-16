@@ -8,23 +8,21 @@ Buffered Draw Commands.
 """
 # pylint: disable=too-many-arguments, too-many-locals, too-few-public-methods
 
-import PIL.Image
-import PIL.ImageOps
-import PIL.ImageDraw
-import numpy as np
-
-import pyglet.gl as gl
-
 from typing import List
 
-from arcade.window_commands import get_projection
-from arcade.window_commands import get_window
+import PIL.Image
+import PIL.ImageDraw
+import PIL.ImageOps
+import numpy as np
+import pyglet.gl as gl
+
+from arcade import shader
 from arcade.arcade_types import Color
 from arcade.arcade_types import PointList
-from arcade import shader
 from arcade.earclip import earclip
 from arcade.utils import *
-
+from arcade.window_commands import get_projection
+from arcade.window_commands import get_window
 
 line_vertex_shader = '''
     #version 330
@@ -778,6 +776,7 @@ def draw_ellipse_outline(center_x: float, center_y: float, width: float,
 
 # --- BEGIN LINE FUNCTIONS # # #
 
+# @jit(cache=True)
 def _generic_draw_line_strip(point_list: PointList,
                              color: Color,
                              mode: int = gl.GL_LINE_STRIP):
@@ -843,6 +842,7 @@ def draw_line_strip(point_list: PointList,
         _generic_draw_line_strip(triangle_point_list, color, gl.GL_TRIANGLE_STRIP)
 
 
+# @jit(cache=True, nogil=True)
 def _get_points_for_thick_line(start_x: float, start_y:
                                float, end_x: float, end_y: float,
                                line_width: float):
@@ -885,6 +885,7 @@ def draw_line(start_x: float, start_y: float, end_x: float, end_y: float,
     _generic_draw_line_strip(triangle_point_list, color, gl.GL_TRIANGLE_STRIP)
 
 
+# @jit(cache=True, nogil=True)
 def draw_lines(point_list: PointList,
                color: Color,
                line_width: float=1):
